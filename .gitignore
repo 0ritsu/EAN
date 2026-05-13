@@ -1,0 +1,8 @@
+build/
+*.user
+*.pro.user
+*.pro.user.*
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.autosave
