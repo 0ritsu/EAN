@@ -30,6 +30,17 @@ CholeskyResult CholeskySolver::solve(const std::vector<std::vector<double>> &A,
         }
     }
 
+    const double eps = 1e-12;
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = i + 1; j < n; ++j) {
+            if (std::abs(A[i][j] - A[j][i]) > eps) {
+                result.ok = false;
+                result.error = "Macierz A nie jest symetryczna.";
+                return result;
+            }
+        }
+    }
+
     std::vector<std::vector<double>> L(n, std::vector<double>(n, 0.0));
     int steps = 0;
 
