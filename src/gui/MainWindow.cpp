@@ -17,7 +17,7 @@ QString formatVector(const std::vector<double> &v) {
         if (i > 0) {
             oss << ", ";
         }
-        oss << std::setprecision(17) << v[i];
+        oss << std::fixed << std::setprecision(17) << v[i];
     }
     oss << "]";
     return QString::fromStdString(oss.str());

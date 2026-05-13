@@ -18,7 +18,7 @@ using interval_arithmetic::PINT_MODE;
 namespace {
 std::string formatDouble(long double v) {
     std::ostringstream oss;
-    oss << std::setprecision(17) << v;
+    oss << std::fixed << std::setprecision(17) << v;
     return oss.str();
 }
 
