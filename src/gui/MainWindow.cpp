@@ -3,6 +3,26 @@
 
 #include "core/Parser.h"
 #include "core/IterationLogger.h"
+#include "core/CholeskySolver.h"
+#include "core/IntervalSolver.h"
+
+#include <sstream>
+#include <iomanip>
+
+namespace {
+QString formatVector(const std::vector<double> &v) {
+    std::ostringstream oss;
+    oss << "[";
+    for (size_t i = 0; i < v.size(); ++i) {
+        if (i > 0) {
+            oss << ", ";
+        }
+        oss << std::setprecision(17) << v[i];
+    }
+    oss << "]";
+    return QString::fromStdString(oss.str());
+}
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -34,19 +54,52 @@ void MainWindow::onComputeClicked() {
         return;
     }
 
-    ParseResult parse = Parser::parse(rawInput);
+    ParsedInput parse = Parser::parse(rawInput);
     if (!parse.ok) {
         setStatus(parse.error, true);
         return;
     }
 
-    logger.log("[INFO] Wejście sparsowane poprawnie. TODO: uruchom solver.");
-    setStatus("OK. TODO: obliczenia.");
+    const int maxIter = ui->maxIterSpin->value();
 
-    // TODO:
-    // - odczytaj tryb (radio button)
-    // - wywołaj solver (zwykły / przedziałowy)
-    // - wypisz lewy/prawy koniec oraz szerokość
-    // - loguj każdy krok iteracji
-    // - obsłuż limit iteracji
+    if (ui->modeNormal->isChecked()) {
+        std::vector<std::vector<double>> A;
+        std::vector<double> b;
+        QString error;
+        if (!Parser::toDoubleMatrix(parse, A, b, error)) {
+            setStatus(error, true);
+            return;
+        }
+
+        CholeskyResult result = CholeskySolver::solve(A, b, maxIter);
+        for (const auto &line : result.log) {
+            logger.log(QString::fromStdString(line));
+        }
+        if (!result.ok) {
+            setStatus(QString::fromStdString(result.error), true);
+            return;
+        }
+
+        ui->leftOutput->setText(formatVector(result.x));
+        ui->rightOutput->setText("-");
+        ui->widthOutput->setText("-");
+        setStatus("OK.");
+        return;
+    }
+
+    IntervalMode mode = ui->modeIntervalInterval->isChecked() ? IntervalMode::IntervalInput
+                                                             : IntervalMode::RealInput;
+    IntervalResult result = IntervalSolver::solve(parse, mode, maxIter);
+    for (const auto &line : result.log) {
+        logger.log(QString::fromStdString(line));
+    }
+    if (!result.ok) {
+        setStatus(QString::fromStdString(result.error), true);
+        return;
+    }
+
+    ui->leftOutput->setText(QString::fromStdString(result.left));
+    ui->rightOutput->setText(QString::fromStdString(result.right));
+    ui->widthOutput->setText(QString::fromStdString(result.width));
+    setStatus("OK.");
 }
