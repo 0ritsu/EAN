@@ -33,4 +33,7 @@ add_executable(EAN
 
 target_include_directories(EAN PRIVATE src)
 
-target_link_libraries(EAN PRIVATE ${QT_LIBS})
+target_link_libraries(EAN PRIVATE ${QT_LIBS} mpfr gmp)
+
+target_include_directories(EAN PRIVATE src src/interval)
+target_compile_definitions(EAN PRIVATE MPFR_USE_NO_MACRO MPFR_USE_INTMAX_T)

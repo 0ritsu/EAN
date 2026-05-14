@@ -23,7 +23,58 @@ QString formatVector(const std::vector<double> &v) {
     return QString::fromStdString(oss.str());
 }
 }
+std::vector<double> extractDoubles(const std::string& s) {
+    std::vector<double> res;
+    std::string num;
+    bool in_num = false;
+    for (char c : s) {
+        if ((c >= '0' && c <= '9') || c == '.' || c == '-' || c == 'E' || c == 'e' || c == '+') {
+            num += c;
+            in_num = true;
+        } else {
+            if (in_num && !num.empty()) {
+                res.push_back(std::stod(num));
+                num.clear();
+            }
+            in_num = false;
+        }
+    }
+    if (in_num && !num.empty()) {
+        res.push_back(std::stod(num));
+    }
+    return res;
+}
 
+QString formatScientificListToFixed(const std::string& input) {
+    std::ostringstream oss;
+    oss << "[";
+    std::string current;
+    bool first = true;
+    for (size_t i = 0; i < input.size(); ++i) {
+        char c = input[i];
+        // Złap cyfry, minusy, kropki, E/e, plusy (dla notacji naukowej)
+        if ((c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.' || c == 'E' || c == 'e') {
+            current += c;
+        } else {
+            if (!current.empty()) {
+                double val = std::stod(current);
+                if (!first)
+                    oss << ", ";
+                oss << std::fixed << std::setprecision(17) << val;
+                first = false;
+                current.clear();
+            }
+        }
+    }
+    if (!current.empty()) {
+        double val = std::stod(current);
+        if (!first)
+            oss << ", ";
+        oss << std::fixed << std::setprecision(17) << val;
+    }
+    oss << "]";
+    return QString::fromStdString(oss.str());
+}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
@@ -98,8 +149,8 @@ void MainWindow::onComputeClicked() {
         return;
     }
 
-    ui->leftOutput->setText(QString::fromStdString(result.left));
-    ui->rightOutput->setText(QString::fromStdString(result.right));
-    ui->widthOutput->setText(QString::fromStdString(result.width));
+    ui->leftOutput->setText(formatScientificListToFixed(result.left));
+    ui->rightOutput->setText(formatScientificListToFixed(result.right));
+    ui->widthOutput->setText(formatScientificListToFixed(result.width));
     setStatus("OK.");
 }

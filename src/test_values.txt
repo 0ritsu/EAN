@@ -1,0 +1,75 @@
+// Macierz przedziałowa niesymetryczna
+A = [
+  [[1.0, 1.1], [2.0, 2.1], [3.0, 3.1]],
+  [[2.0, 2.1], [4.0, 4.1], [5.0, 5.1]],
+  [[3.5, 3.6], [5.0, 5.1], [6.0, 6.1]]
+]
+b = [[1, 1.1], [2, 2.1], [3, 3.1]]
+
+
+Macierz dobrze uwarunkowana, symetryczna, dodatnio określona.
+A = [
+    [4, 1],
+    [1, 3]
+]
+b = [1, 2]
+
+
+Przedziały zerowej szerokości (czyli odpowiednik zwykłych liczb).
+A = [
+    [[4.0, 4.0], [1.0, 1.0]],
+    [[1.0, 1.0], [3.0, 3.0]]
+]
+b = [[1.0, 1.0], [2.0, 2.0]]
+
+
+Przekątna wyraźnie większa od sumy elementów poza przekątną → rozkład Cholesky przechodzi, nie ma ujemnych pod pierwiastkiem, symetria zachowana.
+A = [
+    [[4.0, 4.1], [0.9, 1.1]],
+    [[0.9, 1.1], [3.0, 3.1]]
+]
+b = [[1.0, 1.1], [2.0, 2.1]]
+
+
+A[0][1] ≠ A[1][0] (w obu końcach przedziału) → komunikat: "Macierz A nie jest symetryczna"
+A = [
+    [[1.0, 2.0], [3.0, 4.0]],
+    [[4.5, 5.0], [5.0, 6.0]]
+]
+b = [[1, 1], [1, 1]]
+
+
+A[0][2] ≠ A[2][0] → komunikat: "Macierz A nie jest symetryczna"
+A = [
+    [[1.0, 1.1], [2.0, 2.1], [3.0, 3.1]],
+    [[2.0, 2.1], [4.0, 4.1], [5.0, 5.1]],
+    [[3.5, 3.6], [5.0, 5.1], [6.0, 6.1]]
+]
+b = [[1, 1.1], [2, 2.1], [3, 3.1]]
+
+
+Przekątna < elementy poza przekątną → przedziały „rozlewają się” na liczby ujemne pod pierwiastkiem; pojawia się komunikat o nieudanym pierwiastkowaniu.
+A = [
+    [[1.0, 1.1], [2.9, 3.0]],
+    [[2.9, 3.0], [1.0, 1.1]]
+]
+b = [[1, 1], [1, 1]]
+
+
+Przedziały na przekątnej są za wąskie lub za małe względem poza przekątną; pojawi się "Nie można wyznaczyć pierwiastka (ujemny przedział)".
+A = [
+    [[2.0, 3.0], [1.9, 2.1], [1.8, 2.2]],
+    [[1.9, 2.1], [2.0, 3.0], [1.8, 2.2]],
+    [[1.8, 2.2], [1.8, 2.2], [2.0, 3.0]]
+]
+b = [[1, 1.2], [1, 1.2], [1, 1.2]]
+
+
+b ma długość 1, A to 2x2 → komunikat: "Rozmiar b nie pasuje do macierzy A."
+A = [
+    [[1.0, 1.0], [2.0, 2.0]],
+    [[2.0, 2.0], [1.0, 1.0]]
+]
+b = [[1, 1]]
+
+

@@ -88,15 +88,36 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
             b[i] = cell;
         }
 
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = i + 1; j < n; ++j) {
-                if (A[i][j].a != A[j][i].a || A[i][j].b != A[j][i].b) {
-                    result.ok = false;
-                    result.error = "Macierz A nie jest symetryczna.";
-                    return result;
-                }
-            }
-        }
+		if (mode == IntervalMode::RealInput) {
+    		const long double eps = 1e-14;
+    		for (size_t i = 0; i < n; ++i) {
+        		for (size_t j = 0; j < n; ++j) {
+            		if (std::abs(A[i][j].a - A[i][j].b) > eps) {
+                		result.ok = false;
+                		result.error = "W trybie „przedziałowa dla danych rzeczywistych” dozwolone są tylko liczby rzeczywiste (przedziały punktowe)!";
+                		return result;
+            		}
+        		}
+    		}
+    		for (size_t i = 0; i < n; ++i) {
+        		if (std::abs(b[i].a - b[i].b) > eps) {
+            		result.ok = false;
+            		result.error = "W trybie „przedziałowa dla danych rzeczywistych” dozwolone są tylko liczby rzeczywiste (przedziały punktowe)!";
+            		return result;
+        		}
+    		}
+		}
+
+        const long double eps = 1e-14;
+		for (size_t i = 0; i < n; ++i) {
+    		for (size_t j = i + 1; j < n; ++j) {
+        		if (fabsl(A[i][j].a - A[j][i].a) > eps || fabsl(A[i][j].b - A[j][i].b) > eps) {
+            		result.ok = false;
+            		result.error = "Macierz A nie jest symetryczna.";
+            		return result;
+        		}
+    		}
+		}
 
         std::vector<std::vector<Interval<long double>>> L(n, std::vector<Interval<long double>>(n, Interval<long double>(0, 0)));
         int steps = 0;
@@ -176,7 +197,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
         for (size_t i = 0; i < n; ++i) {
             std::string left, right;
             x[i].IEndsToStrings(left, right);
-            long double width = x[i].GetWidth();
+            long double width = IntWidth(x[i]);
 
             if (i > 0) {
                 leftOut << ", ";
