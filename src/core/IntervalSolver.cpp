@@ -16,13 +16,13 @@ using interval_arithmetic::ISqrt;
 using interval_arithmetic::PINT_MODE;
 
 namespace {
-std::string formatDouble(double v) {
+std::string formatLongDouble(long double v) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(17) << v;
     return oss.str();
 }
 
-bool parseIntervalToken(const QString &token, Interval<double> &out, std::string &error) {
+bool parseIntervalToken(const QString &token, Interval<long double> &out, std::string &error) {
     if (token.startsWith('[')) {
         if (!token.endsWith(']')) {
             error = "Nie domknięto przedziału.";
@@ -36,13 +36,13 @@ bool parseIntervalToken(const QString &token, Interval<double> &out, std::string
         }
         QString left = inner.left(comma);
         QString right = inner.mid(comma + 1);
-        out.a = LeftRead<double>(left.toStdString());
-        out.b = RightRead<double>(right.toStdString());
+        out.a = LeftRead<long double>(left.toStdString());
+        out.b = RightRead<long double>(right.toStdString());
         return true;
     }
 
-    out.a = LeftRead<double>(token.toStdString());
-    out.b = RightRead<double>(token.toStdString());
+    out.a = LeftRead<long double>(token.toStdString());
+    out.b = RightRead<long double>(token.toStdString());
     return true;
 }
 }
@@ -57,11 +57,11 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
             return result;
         }
 
-        Interval<double>::Initialize();
-        Interval<double>::SetMode(PINT_MODE);
+        Interval<long double>::Initialize();
+        Interval<long double>::SetMode(PINT_MODE);
 
-        std::vector<std::vector<Interval<double>>> A(n, std::vector<Interval<double>>(n));
-        std::vector<Interval<double>> b(n);
+        std::vector<std::vector<Interval<long double>>> A(n, std::vector<Interval<long double>>(n));
+        std::vector<Interval<long double>> b(n);
 
         for (size_t i = 0; i < n; ++i) {
             if (input.A[i].size() != n) {
@@ -70,7 +70,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
                 return result;
             }
             for (size_t j = 0; j < n; ++j) {
-                Interval<double> cell;
+                Interval<long double> cell;
                 if (!parseIntervalToken(input.A[i][j], cell, result.error)) {
                     result.ok = false;
                     return result;
@@ -80,7 +80,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
         }
 
         for (size_t i = 0; i < n; ++i) {
-            Interval<double> cell;
+            Interval<long double> cell;
             if (!parseIntervalToken(input.b[i], cell, result.error)) {
                 result.ok = false;
                 return result;
@@ -89,7 +89,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
         }
 
 		if (mode == IntervalMode::RealInput) {
-    		const double eps = 1e-14;
+    		const long double eps = 1e-14;
     		for (size_t i = 0; i < n; ++i) {
         		for (size_t j = 0; j < n; ++j) {
             		if (std::abs(A[i][j].a - A[i][j].b) > eps) {
@@ -108,7 +108,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
     		}
 		}
 
-        const double eps = 1e-14;
+        const long double eps = 1e-14;
 		for (size_t i = 0; i < n; ++i) {
     		for (size_t j = i + 1; j < n; ++j) {
         		if (fabsl(A[i][j].a - A[j][i].a) > eps || fabsl(A[i][j].b - A[j][i].b) > eps) {
@@ -119,7 +119,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
     		}
 		}
 
-        std::vector<std::vector<Interval<double>>> L(n, std::vector<Interval<double>>(n, Interval<double>(0, 0)));
+        std::vector<std::vector<Interval<long double>>> L(n, std::vector<Interval<long double>>(n, Interval<long double>(0, 0)));
         int steps = 0;
 
         for (size_t i = 0; i < n; ++i) {
@@ -130,14 +130,14 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
                     return result;
                 }
 
-                Interval<double> sum = A[i][j];
+                Interval<long double> sum = A[i][j];
                 for (size_t k = 0; k < j; ++k) {
                     sum = ISub(sum, IMul(L[i][k], L[j][k]));
                 }
 
                 if (i == j) {
                     int st = 0;
-                    Interval<double> root = ISqrt(sum, st);
+                    Interval<long double> root = ISqrt(sum, st);
                     if (st != 0) {
                         result.ok = false;
                         result.error = "Nie można wyznaczyć pierwiastka (ujemny przedział).";
@@ -154,14 +154,14 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
             }
         }
 
-        std::vector<Interval<double>> y(n, Interval<double>(0, 0));
+        std::vector<Interval<long double>> y(n, Interval<long double>(0, 0));
         for (size_t i = 0; i < n; ++i) {
             if (++steps > maxIter) {
                 result.ok = false;
                 result.error = "Przekroczono maksymalną liczbę iteracji.";
                 return result;
             }
-            Interval<double> sum = b[i];
+            Interval<long double> sum = b[i];
             for (size_t k = 0; k < i; ++k) {
                 sum = ISub(sum, IMul(L[i][k], y[k]));
             }
@@ -171,14 +171,14 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
             result.log.push_back("y[" + std::to_string(i) + "] = [" + left + "," + right + "]");
         }
 
-        std::vector<Interval<double>> x(n, Interval<double>(0, 0));
+        std::vector<Interval<long double>> x(n, Interval<long double>(0, 0));
         for (int i = static_cast<int>(n) - 1; i >= 0; --i) {
             if (++steps > maxIter) {
                 result.ok = false;
                 result.error = "Przekroczono maksymalną liczbę iteracji.";
                 return result;
             }
-            Interval<double> sum = y[i];
+            Interval<long double> sum = y[i];
             for (size_t k = i + 1; k < n; ++k) {
                 sum = ISub(sum, IMul(L[k][i], x[k]));
             }
@@ -197,7 +197,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
         for (size_t i = 0; i < n; ++i) {
             std::string left, right;
             x[i].IEndsToStrings(left, right);
-            double width = IntWidth(x[i]);
+            long double width = IntWidth(x[i]);
 
             if (i > 0) {
                 leftOut << ", ";
@@ -206,7 +206,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
             }
             leftOut << left;
             rightOut << right;
-            widthOut << formatDouble(width);
+            widthOut << formatLongDouble(width);
         }
         leftOut << "]";
         rightOut << "]";
