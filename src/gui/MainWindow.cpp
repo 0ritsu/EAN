@@ -5,9 +5,13 @@
 #include "core/IterationLogger.h"
 #include "core/CholeskySolver.h"
 #include "core/IntervalSolver.h"
-
+#include "interval/Interval.h"
+#include <mpreal.h>
 #include <sstream>
 #include <iomanip>
+
+using namespace mpfr;
+using namespace interval_arithmetic;
 
 namespace {
 QString formatVector(const std::vector<double> &v) {
@@ -22,6 +26,34 @@ QString formatVector(const std::vector<double> &v) {
     oss << "]";
     return QString::fromStdString(oss.str());
 }
+}
+QString formatScientificList(const std::string& input) {
+    std::ostringstream oss;
+    oss << "[";
+    std::string current;
+    bool first = true;
+    for (char c : input) {
+        if ((c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.' || c == 'E' || c == 'e') {
+            current += c;
+        } else {
+            if (!current.empty()) {
+                double val = std::stod(current);
+                if (!first)
+                    oss << ", ";
+                oss << std::scientific << val;
+                first = false;
+                current.clear();
+            }
+        }
+    }
+    if (!current.empty()) {
+        double val = std::stod(current);
+        if (!first)
+            oss << ", ";
+        oss << std::scientific << val;
+    }
+    oss << "]";
+    return QString::fromStdString(oss.str());
 }
 std::vector<double> extractDoubles(const std::string& s) {
     std::vector<double> res;
@@ -99,6 +131,11 @@ void MainWindow::onComputeClicked() {
     IterationLogger logger(ui->logOutput);
     logger.clear();
 
+	int digits = ui->spinPrecision->value();
+    int bits = static_cast<int>(digits * 3.32193) + 5; // zapas kilku bitów
+    mpfr::mpreal::set_default_prec(bits);
+    interval_arithmetic::Interval<mpfr::mpreal>::SetPrecision((interval_arithmetic::IAPrecision)bits);
+
     const QString rawInput = ui->inputEdit->toPlainText();
     if (rawInput.trimmed().isEmpty()) {
         setStatus("Wpisz dane wejściowe.", true);
@@ -151,6 +188,6 @@ void MainWindow::onComputeClicked() {
 
     ui->leftOutput->setText(formatScientificListToFixed(result.left));
     ui->rightOutput->setText(formatScientificListToFixed(result.right));
-    ui->widthOutput->setText(formatScientificListToFixed(result.width));
+    ui->widthOutput->setText(formatScientificList(result.width));
     setStatus("OK.");
 }
