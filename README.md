@@ -4,7 +4,7 @@
 - Qt 6 (lub Qt 5)
 - CMake >= 3.20
 - Kompilator C++17
-- GMP/MPFR (dla mpreal/Interval) – do dołączenia w kolejnym kroku
+- GMP/MPFR (dla mpreal/Interval)
 
 ## Struktura
 - `src/gui` – GUI (Qt Widgets)
@@ -16,9 +16,3 @@
 cmake -S . -B build
 cmake --build build
 ```
-
-## Następne kroki
-1. Wklej pełne treści `Interval.h` i `mpreal.h` do `src/interval/`.
-2. Uzupełnij parser wejścia (macierz + wektor w jednym polu).
-3. Uzupełnij solver Choleskiego (arytmetyka zwykła i przedziałowa).
-4. Dokończ dokumentację i przykłady wejścia.
