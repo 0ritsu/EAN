@@ -131,10 +131,7 @@ void MainWindow::onComputeClicked() {
     IterationLogger logger(ui->logOutput);
     logger.clear();
 
-	int digits = ui->spinPrecision->value();
-    int bits = static_cast<int>(digits * 3.32193) + 5; // zapas kilku bitów
-    mpfr::mpreal::set_default_prec(bits);
-    interval_arithmetic::Interval<mpfr::mpreal>::SetPrecision((interval_arithmetic::IAPrecision)bits);
+    
 
     const QString rawInput = ui->inputEdit->toPlainText();
     if (rawInput.trimmed().isEmpty()) {
@@ -148,7 +145,6 @@ void MainWindow::onComputeClicked() {
         return;
     }
 
-    const int maxIter = ui->maxIterSpin->value();
 
     if (ui->modeNormal->isChecked()) {
         std::vector<std::vector<double>> A;
@@ -159,7 +155,7 @@ void MainWindow::onComputeClicked() {
             return;
         }
 
-        CholeskyResult result = CholeskySolver::solve(A, b, maxIter);
+        CholeskyResult result = CholeskySolver::solve(A, b);
         for (const auto &line : result.log) {
             logger.log(QString::fromStdString(line));
         }
@@ -177,7 +173,7 @@ void MainWindow::onComputeClicked() {
 
     IntervalMode mode = ui->modeIntervalInterval->isChecked() ? IntervalMode::IntervalInput
                                                              : IntervalMode::RealInput;
-    IntervalResult result = IntervalSolver::solve(parse, mode, maxIter);
+    IntervalResult result = IntervalSolver::solve(parse, mode);
     for (const auto &line : result.log) {
         logger.log(QString::fromStdString(line));
     }

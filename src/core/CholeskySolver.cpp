@@ -13,8 +13,7 @@ std::string formatDouble(double v) {
 }
 
 CholeskyResult CholeskySolver::solve(const std::vector<std::vector<double>> &A,
-                                     const std::vector<double> &b,
-                                     int maxIter) {
+                                     const std::vector<double> &b) {
     CholeskyResult result;
     const size_t n = A.size();
     if (n == 0 || b.size() != n) {
@@ -42,16 +41,8 @@ CholeskyResult CholeskySolver::solve(const std::vector<std::vector<double>> &A,
     }
 
     std::vector<std::vector<double>> L(n, std::vector<double>(n, 0.0));
-    int steps = 0;
-
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = 0; j <= i; ++j) {
-            if (++steps > maxIter) {
-                result.ok = false;
-                result.error = "Przekroczono maksymalną liczbę iteracji.";
-                return result;
-            }
-
             double sum = A[i][j];
             for (size_t k = 0; k < j; ++k) {
                 sum -= L[i][k] * L[j][k];
@@ -74,11 +65,6 @@ CholeskyResult CholeskySolver::solve(const std::vector<std::vector<double>> &A,
 
     std::vector<double> y(n, 0.0);
     for (size_t i = 0; i < n; ++i) {
-        if (++steps > maxIter) {
-            result.ok = false;
-            result.error = "Przekroczono maksymalną liczbę iteracji.";
-            return result;
-        }
         double sum = b[i];
         for (size_t k = 0; k < i; ++k) {
             sum -= L[i][k] * y[k];
@@ -89,11 +75,6 @@ CholeskyResult CholeskySolver::solve(const std::vector<std::vector<double>> &A,
 
     std::vector<double> x(n, 0.0);
     for (int i = static_cast<int>(n) - 1; i >= 0; --i) {
-        if (++steps > maxIter) {
-            result.ok = false;
-            result.error = "Przekroczono maksymalną liczbę iteracji.";
-            return result;
-        }
         double sum = y[i];
         for (size_t k = i + 1; k < n; ++k) {
             sum -= L[k][i] * x[k];

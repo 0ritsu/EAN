@@ -47,7 +47,7 @@ bool parseIntervalToken(const QString &token, Interval<long double> &out, std::s
 }
 }
 
-IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode, int maxIter) {
+IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode) {
     IntervalResult result;
     try {
         const size_t n = input.A.size();
@@ -124,12 +124,6 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
 
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = 0; j <= i; ++j) {
-                if (++steps > maxIter) {
-                    result.ok = false;
-                    result.error = "Przekroczono maksymalną liczbę iteracji.";
-                    return result;
-                }
-
                 Interval<long double> sum = A[i][j];
                 for (size_t k = 0; k < j; ++k) {
                     sum = ISub(sum, IMul(L[i][k], L[j][k]));
@@ -156,11 +150,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
 
         std::vector<Interval<long double>> y(n, Interval<long double>(0, 0));
         for (size_t i = 0; i < n; ++i) {
-            if (++steps > maxIter) {
-                result.ok = false;
-                result.error = "Przekroczono maksymalną liczbę iteracji.";
-                return result;
-            }
+
             Interval<long double> sum = b[i];
             for (size_t k = 0; k < i; ++k) {
                 sum = ISub(sum, IMul(L[i][k], y[k]));
@@ -173,11 +163,7 @@ IntervalResult IntervalSolver::solve(const ParsedInput &input, IntervalMode mode
 
         std::vector<Interval<long double>> x(n, Interval<long double>(0, 0));
         for (int i = static_cast<int>(n) - 1; i >= 0; --i) {
-            if (++steps > maxIter) {
-                result.ok = false;
-                result.error = "Przekroczono maksymalną liczbę iteracji.";
-                return result;
-            }
+
             Interval<long double> sum = y[i];
             for (size_t k = i + 1; k < n; ++k) {
                 sum = ISub(sum, IMul(L[k][i], x[k]));

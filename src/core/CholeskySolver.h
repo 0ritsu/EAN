@@ -13,6 +13,5 @@ struct CholeskyResult {
 class CholeskySolver {
 public:
     static CholeskyResult solve(const std::vector<std::vector<double>> &A,
-                                const std::vector<double> &b,
-                                int maxIter);
+                                const std::vector<double> &b);
 };

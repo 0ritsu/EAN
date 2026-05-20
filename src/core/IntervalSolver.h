@@ -21,5 +21,5 @@ struct IntervalResult {
 
 class IntervalSolver {
 public:
-    static IntervalResult solve(const ParsedInput &input, IntervalMode mode, int maxIter);
+    static IntervalResult solve(const ParsedInput &input, IntervalMode mode);
 };
