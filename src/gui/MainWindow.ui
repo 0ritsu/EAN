@@ -156,7 +156,7 @@ b = [[0.9,1.1],[1.9,2.1]]</string>
       <item>
        <widget class="QGroupBox" name="logGroup">
         <property name="title">
-         <string>Log iteracji</string>
+         <string>Log obliczeń</string>
         </property>
         <layout class="QVBoxLayout" name="logLayout">
          <item>

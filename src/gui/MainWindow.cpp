@@ -131,7 +131,7 @@ void MainWindow::onComputeClicked() {
     IterationLogger logger(ui->logOutput);
     logger.clear();
 
-    
+
 
     const QString rawInput = ui->inputEdit->toPlainText();
     if (rawInput.trimmed().isEmpty()) {
