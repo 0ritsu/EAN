@@ -2,9 +2,9 @@
 
 #include <QPlainTextEdit>
 
-class IterationLogger {
+class ComputationLogger {
 public:
-    explicit IterationLogger(QPlainTextEdit *output);
+    explicit ComputationLogger(QPlainTextEdit *output);
     void clear();
     void log(const QString &line);
 

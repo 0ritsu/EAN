@@ -2,7 +2,7 @@
 #include "ui_MainWindow.h"
 
 #include "core/Parser.h"
-#include "core/IterationLogger.h"
+#include "core/ComputationLogger.h"
 #include "core/CholeskySolver.h"
 #include "core/IntervalSolver.h"
 #include "interval/Interval.h"
@@ -128,7 +128,7 @@ void MainWindow::setStatus(const QString &text, bool isError) {
 }
 
 void MainWindow::onComputeClicked() {
-    IterationLogger logger(ui->logOutput);
+    ComputationLogger logger(ui->logOutput);
     logger.clear();
 
 
