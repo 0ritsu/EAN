@@ -9,6 +9,8 @@
 #include <mpreal.h>
 #include <sstream>
 #include <iomanip>
+#include <QDebug>
+#include <QString>
 
 using namespace mpfr;
 using namespace interval_arithmetic;
@@ -84,7 +86,6 @@ QString formatScientificListToFixed(const std::string& input) {
     bool first = true;
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
-        // Złap cyfry, minusy, kropki, E/e, plusy (dla notacji naukowej)
         if ((c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.' || c == 'E' || c == 'e') {
             current += c;
         } else {
@@ -164,12 +165,14 @@ void MainWindow::onComputeClicked() {
             return;
         }
 
+
         ui->leftOutput->setText(formatVector(result.x));
         ui->rightOutput->setText("-");
         ui->widthOutput->setText("-");
         setStatus("OK.");
         return;
     }
+
 
     IntervalMode mode = ui->modeIntervalInterval->isChecked() ? IntervalMode::IntervalInput
                                                              : IntervalMode::RealInput;
@@ -182,8 +185,8 @@ void MainWindow::onComputeClicked() {
         return;
     }
 
-    ui->leftOutput->setText(formatScientificListToFixed(result.left));
-    ui->rightOutput->setText(formatScientificListToFixed(result.right));
+    ui->leftOutput->setText(QString::fromStdString(result.left));
+    ui->rightOutput->setText(QString::fromStdString(result.right));
     ui->widthOutput->setText(formatScientificList(result.width));
     setStatus("OK.");
 }

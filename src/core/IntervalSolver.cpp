@@ -5,15 +5,7 @@
 
 #include "interval/Interval.h"
 
-using interval_arithmetic::Interval;
-using interval_arithmetic::LeftRead;
-using interval_arithmetic::RightRead;
-using interval_arithmetic::IAdd;
-using interval_arithmetic::ISub;
-using interval_arithmetic::IMul;
-using interval_arithmetic::IDiv;
-using interval_arithmetic::ISqrt;
-using interval_arithmetic::PINT_MODE;
+using namespace interval_arithmetic;
 
 namespace {
 std::string formatLongDouble(long double v) {
